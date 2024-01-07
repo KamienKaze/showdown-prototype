@@ -55,12 +55,6 @@ public class NetworkTransportManager : MonoBehaviour
                 currentTransportConnectionManager =
                     facepunchConnectionManager.GetComponent<FacepunchConnectionManager>();
 
-                GameManager
-                    .Singleton
-                    .SetConnectionManager(
-                        facepunchConnectionManager.GetComponent<FacepunchConnectionManager>()
-                    );
-
                 break;
 
             case NetworkTransport.Unity:
@@ -74,12 +68,6 @@ public class NetworkTransportManager : MonoBehaviour
 
                 currentTransportConnectionManager =
                     unityConnectionManager.GetComponent<UnityConnectionManager>();
-
-                GameManager
-                    .Singleton
-                    .SetConnectionManager(
-                        unityConnectionManager.GetComponent<UnityConnectionManager>()
-                    );
 
                 break;
         }

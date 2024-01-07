@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/ProjectFiles/MainMenu/MainMenu.unity
     guid: 6452c694676cf5743a920a059f8a8d9d
   - enabled: 1
-    path: Assets/ProjectFiles/Playground/Playground.unity
+    path: Assets/ProjectFiles/GameLobby/GameLobby.unity
+    guid: 7676118c3efc9514a8c289d88bc37d2d
+  - enabled: 1
+    path: Assets/ProjectFiles/Maps/Playground/Playground.unity
     guid: 2e3e57e07b82c4d4cbc515b09dff118a
   m_configObjects: {}

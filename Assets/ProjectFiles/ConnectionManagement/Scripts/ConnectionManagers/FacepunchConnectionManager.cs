@@ -108,10 +108,9 @@ public class FacepunchConnectionManager : ConnectionManager
         NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
         NetworkManager.Singleton.StartHost();
 
-        currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
+        OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
 
-        connectionState = ConnectionState.Connected;
-        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
     }
 
     public void StartClient(SteamId steamId)
@@ -126,8 +125,7 @@ public class FacepunchConnectionManager : ConnectionManager
             return;
         }
 
-        connectionState = ConnectionState.Connected;
-        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
     }
 
     public void Disconnect()
@@ -149,10 +147,9 @@ public class FacepunchConnectionManager : ConnectionManager
                 Singleton_OnClientConnectedCallback;
         }
 
-        NetworkManager.Singleton.Shutdown(true);
+        OnConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
 
-        connectionState = ConnectionState.Disconnected;
-        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        NetworkManager.Singleton.Shutdown(true);
     }
 
     // Netcode for Gameobjects Callbacks

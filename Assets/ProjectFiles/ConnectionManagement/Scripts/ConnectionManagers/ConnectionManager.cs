@@ -1,8 +1,13 @@
 using System;
 using UnityEngine;
 
+public enum ConnectionState
+{
+    Connected,
+    Disconnected,
+}
+
 public class ConnectionManager : MonoBehaviour
 {
-    public ConnectionState connectionState;
-    public Action<ConnectionState> ConnectionManager_OnConnectionStateChanged;
+    public Action<ConnectionState> OnConnectionStateChanged;
 }

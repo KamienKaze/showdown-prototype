@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEngine;
 
 public class UnityConnectionManager : ConnectionManager
 {
@@ -24,8 +26,7 @@ public class UnityConnectionManager : ConnectionManager
         NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
         NetworkManager.Singleton.StartHost();
 
-        connectionState = ConnectionState.Connected;
-        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
     }
 
     public void StartClient()
@@ -38,8 +39,7 @@ public class UnityConnectionManager : ConnectionManager
             return;
         }
 
-        connectionState = ConnectionState.Connected;
-        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
     }
 
     public void Disconnect()
@@ -59,10 +59,9 @@ public class UnityConnectionManager : ConnectionManager
                 Singleton_OnClientConnectedCallback;
         }
 
-        NetworkManager.Singleton.Shutdown(true);
+        OnConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
 
-        connectionState = ConnectionState.Disconnected;
-        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        NetworkManager.Singleton.Shutdown(true);
     }
 
     private void Singleton_OnServerStarted() { }
