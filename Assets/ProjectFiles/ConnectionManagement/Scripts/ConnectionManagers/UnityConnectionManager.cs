@@ -1,12 +1,8 @@
-using System;
 using Unity.Netcode;
-using UnityEngine;
 
-public class UnityConnectionManager : MonoBehaviour
+public class UnityConnectionManager : ConnectionManager
 {
     public static UnityConnectionManager Singleton { get; private set; } = null;
-    public ConnectionState connectionState;
-    public Action<ConnectionState> FacepunchConnectionManager_OnConnectionStateChanged;
 
     private void Awake()
     {

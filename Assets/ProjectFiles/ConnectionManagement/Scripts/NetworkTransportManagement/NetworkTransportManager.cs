@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class NetworkTransportManager : MonoBehaviour
 {
+    [HideInInspector]
+    public ConnectionManager currentTransportConnectionManager;
+
     [SerializeField]
     private NetworkTransport currentTransport;
 
@@ -48,6 +51,10 @@ public class NetworkTransportManager : MonoBehaviour
                 facepunchConnectionManager.SetActive(true);
                 facepunchTransportMenu.SetActive(true);
                 facepunchLogo.SetActive(true);
+
+                currentTransportConnectionManager =
+                    facepunchConnectionManager.GetComponent<FacepunchConnectionManager>();
+
                 break;
 
             case NetworkTransport.Unity:
@@ -58,6 +65,9 @@ public class NetworkTransportManager : MonoBehaviour
                 unityConnectionManager.SetActive(true);
                 unityTransportMenu.SetActive(true);
                 unityLogo.SetActive(true);
+
+                currentTransportConnectionManager =
+                    unityConnectionManager.GetComponent<UnityConnectionManager>();
                 break;
         }
     }

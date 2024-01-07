@@ -1,18 +1,14 @@
-using System;
 using Netcode.Transports.Facepunch;
 using Steamworks;
 using Steamworks.Data;
 using Unity.Netcode;
 using UnityEngine;
 
-public class FacepunchConnectionManager : MonoBehaviour
+public class FacepunchConnectionManager : ConnectionManager
 {
     public static FacepunchConnectionManager Singleton { get; private set; } = null;
     private FacepunchTransport transport = null;
     public Lobby? currentLobby { get; private set; } = null;
-
-    public ConnectionState connectionState;
-    public Action<ConnectionState> FacepunchConnectionManager_OnConnectionStateChanged;
 
     [SerializeField]
     private int maxMembers = 4;
