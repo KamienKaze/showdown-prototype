@@ -4,5 +4,5 @@ using UnityEngine;
 public class ConnectionManager : MonoBehaviour
 {
     public ConnectionState connectionState;
-    public Action<ConnectionState> FacepunchConnectionManager_OnConnectionStateChanged;
+    public Action<ConnectionState> ConnectionManager_OnConnectionStateChanged;
 }

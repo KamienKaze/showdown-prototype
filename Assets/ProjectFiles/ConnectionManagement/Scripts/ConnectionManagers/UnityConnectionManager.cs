@@ -25,7 +25,7 @@ public class UnityConnectionManager : ConnectionManager
         NetworkManager.Singleton.StartHost();
 
         connectionState = ConnectionState.Connected;
-        FacepunchConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
     }
 
     public void StartClient()
@@ -39,7 +39,7 @@ public class UnityConnectionManager : ConnectionManager
         }
 
         connectionState = ConnectionState.Connected;
-        FacepunchConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
     }
 
     public void Disconnect()
@@ -62,7 +62,7 @@ public class UnityConnectionManager : ConnectionManager
         NetworkManager.Singleton.Shutdown(true);
 
         connectionState = ConnectionState.Disconnected;
-        FacepunchConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
+        ConnectionManager_OnConnectionStateChanged?.Invoke(connectionState);
     }
 
     private void Singleton_OnServerStarted() { }
