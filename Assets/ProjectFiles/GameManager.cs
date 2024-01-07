@@ -1,4 +1,4 @@
-using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -27,10 +27,19 @@ public class GameManager : MonoBehaviour
         connectionManager.ConnectionManager_OnConnectionStateChanged += HandleConnectionStateChange;
     }
 
-    private void HandleConnectionStateChange(ConnectionState connectionState) { }
+    private void OnDestroy()
+    {
+        connectionManager.ConnectionManager_OnConnectionStateChanged -= HandleConnectionStateChange;
+    }
 
     public void SetConnectionManager(ConnectionManager connectionManager)
     {
         this.connectionManager = connectionManager;
+    }
+
+    private void HandleConnectionStateChange(ConnectionState connectionState)
+    {
+        if (connectionState == ConnectionState.Connected) { }
+        else if (connectionState == ConnectionState.Disconnected) { }
     }
 }
