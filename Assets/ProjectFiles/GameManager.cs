@@ -1,11 +1,21 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(SceneLoader))]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Singleton { get; private set; } = null;
 
-    private ConnectionManager connectionManager;
+    public NetworkTransport currentNetworkTransport;
+
+    [HideInInspector]
+    public ConnectionManager currentConnectionManager;
+
+    [Header("Network Transport Manager Objects")]
+    public GameObject facepunchTransportManager;
+    public GameObject unityTransportManager;
+
+    private InputManager playerInputManager;
+    private SceneLoader sceneLoader;
 
     private void Awake()
     {
@@ -22,37 +32,64 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetConnectionManager(ConnectionManager connectionManager)
+    private void Start()
     {
-        this.connectionManager = connectionManager;
+        playerInputManager = GetComponent<InputManager>();
+        sceneLoader = GetComponent<SceneLoader>();
 
-        connectionManager.OnConnectionStateChanged += OnConnectionStateChanged;
+        SetConnectionManager(currentNetworkTransport);
     }
 
-    private void OnConnectionStateChanged(ConnectionState connectionState)
+    // Connection Manager
+    #region
+
+    public void SetConnectionManager(NetworkTransport networkTransport)
     {
-        if (connectionState == ConnectionState.Connected)
+        switch (networkTransport)
         {
-            Connected();
+            case NetworkTransport.Facepunch:
+                currentConnectionManager =
+                    facepunchTransportManager.GetComponent<FacepunchConnectionManager>();
+
+                facepunchTransportManager.SetActive(true);
+                Destroy(unityTransportManager);
+                break;
+
+            case NetworkTransport.Unity:
+                currentConnectionManager =
+                    unityTransportManager.GetComponent<UnityConnectionManager>();
+
+                unityTransportManager.SetActive(true);
+                Destroy(facepunchTransportManager);
+                break;
         }
-        else if (connectionState == ConnectionState.Disconnected)
+
+        currentConnectionManager.OnConnectionStateChanged += HandleConnectionStateChange;
+    }
+
+    private void HandleConnectionStateChange(ConnectionState connectionState)
+    {
+        switch (connectionState)
         {
-            Disconnected();
+            case ConnectionState.Connected:
+                sceneLoader.LoadMenuScene(MenuScene.GameLobby);
+                break;
+
+            case ConnectionState.Disconnected:
+                sceneLoader.LoadMenuScene(MenuScene.MainMenu);
+                break;
         }
     }
 
-    public void Disconnect()
+    #endregion
+
+    // Input Manager
+    #region
+
+    public InputManager GetInputManager()
     {
-        connectionManager.Disconnect();
+        return playerInputManager;
     }
 
-    private void Connected()
-    {
-        SceneManager.LoadScene("GameLobby", LoadSceneMode.Single);
-    }
-
-    private void Disconnected()
-    {
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
-    }
+    #endregion
 }

@@ -4,6 +4,6 @@ public class GameLobbyManager : MonoBehaviour
 {
     public void Disconnect()
     {
-        GameManager.Singleton.Disconnect();
+        // GameManager.Singleton.Disconnect();
     }
 }
