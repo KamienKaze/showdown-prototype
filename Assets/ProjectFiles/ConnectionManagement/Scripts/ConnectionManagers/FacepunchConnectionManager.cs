@@ -23,7 +23,7 @@ public class FacepunchConnectionManager : ConnectionManager
         }
         else
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
     }
@@ -39,7 +39,9 @@ public class FacepunchConnectionManager : ConnectionManager
         SteamMatchmaking.OnLobbyInvite += SteamMatchmaking_OnLobbyInvite;
         SteamFriends.OnGameLobbyJoinRequested += SteamFriends_OnGameLobbyJoinRequested;
 
-        OnConnectionStateChanged += Disconnected;
+        HostStarted += OnHostStarted;
+        ClientStarted += OnClientStarted;
+        Disconnected += OnDisconnected;
     }
 
     private void OnDestroy()
@@ -51,16 +53,9 @@ public class FacepunchConnectionManager : ConnectionManager
         SteamMatchmaking.OnLobbyInvite -= SteamMatchmaking_OnLobbyInvite;
         SteamFriends.OnGameLobbyJoinRequested -= SteamFriends_OnGameLobbyJoinRequested;
 
-        OnConnectionStateChanged -= Disconnected;
-
-        if (NetworkManager.Singleton == null)
-        {
-            return;
-        }
-
-        NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
-        NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
-        NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
+        HostStarted -= OnHostStarted;
+        ClientStarted -= OnClientStarted;
+        Disconnected -= OnDisconnected;
     }
 
     // Facepunch Transport Callbacks
@@ -85,7 +80,7 @@ public class FacepunchConnectionManager : ConnectionManager
             return;
         }
 
-        StartClient(currentLobby.Value.Owner.Id);
+        StartClient();
     }
 
     private void SteamMatchmaking_OnLobbyMemberJoined(Lobby lobby, Friend friend) { }
@@ -107,74 +102,18 @@ public class FacepunchConnectionManager : ConnectionManager
 
     #endregion
 
-    public async void StartHost()
+    public async void OnHostStarted()
     {
-        NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
-        NetworkManager.Singleton.StartHost();
-
-        OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
-
         currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
     }
 
-    public void StartClient(SteamId steamId)
+    public void OnClientStarted()
     {
-        NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
-        NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
-
-        transport.targetSteamId = steamId;
-
-        if (!NetworkManager.Singleton.StartClient())
-        {
-            return;
-        }
-
-        OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
+        transport.targetSteamId = currentLobby.Value.Owner.Id;
     }
 
-    private void Disconnected(ConnectionState connectionState)
+    public void OnDisconnected()
     {
-        if (connectionState != ConnectionState.Disconnected)
-        {
-            return;
-        }
-
-        currentLobby?.Leave();
-
-        if (NetworkManager.Singleton == null)
-        {
-            return;
-        }
-
-        if (NetworkManager.Singleton.IsHost)
-        {
-            NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
-        }
-        else
-        {
-            NetworkManager.Singleton.OnClientConnectedCallback -=
-                Singleton_OnClientConnectedCallback;
-        }
-
-        NetworkManager.Singleton.Shutdown(true);
+        currentLobby = null;
     }
-
-    // Netcode for Gameobjects Callbacks
-    #region
-
-    private void Singleton_OnServerStarted() { }
-
-    private void Singleton_OnClientConnectedCallback(ulong clientId) { }
-
-    private void Singleton_OnClientDisconnectCallback(ulong clientId)
-    {
-        NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
-
-        if (clientId == 0)
-        {
-            Disconnect();
-        }
-    }
-
-    #endregion
 }
