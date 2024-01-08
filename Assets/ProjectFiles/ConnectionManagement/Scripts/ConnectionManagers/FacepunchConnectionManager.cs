@@ -38,6 +38,8 @@ public class FacepunchConnectionManager : ConnectionManager
         SteamMatchmaking.OnLobbyMemberLeave += SteamMatchmaking_OnLobbyMemberLeave;
         SteamMatchmaking.OnLobbyInvite += SteamMatchmaking_OnLobbyInvite;
         SteamFriends.OnGameLobbyJoinRequested += SteamFriends_OnGameLobbyJoinRequested;
+
+        OnConnectionStateChanged += Disconnected;
     }
 
     private void OnDestroy()
@@ -48,6 +50,8 @@ public class FacepunchConnectionManager : ConnectionManager
         SteamMatchmaking.OnLobbyMemberLeave -= SteamMatchmaking_OnLobbyMemberLeave;
         SteamMatchmaking.OnLobbyInvite -= SteamMatchmaking_OnLobbyInvite;
         SteamFriends.OnGameLobbyJoinRequested -= SteamFriends_OnGameLobbyJoinRequested;
+
+        OnConnectionStateChanged -= Disconnected;
 
         if (NetworkManager.Singleton == null)
         {
@@ -128,8 +132,13 @@ public class FacepunchConnectionManager : ConnectionManager
         OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
     }
 
-    public void Disconnect()
+    private void Disconnected(ConnectionState connectionState)
     {
+        if (connectionState != ConnectionState.Disconnected)
+        {
+            return;
+        }
+
         currentLobby?.Leave();
 
         if (NetworkManager.Singleton == null)
@@ -146,8 +155,6 @@ public class FacepunchConnectionManager : ConnectionManager
             NetworkManager.Singleton.OnClientConnectedCallback -=
                 Singleton_OnClientConnectedCallback;
         }
-
-        OnConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
 
         NetworkManager.Singleton.Shutdown(true);
     }

@@ -19,6 +19,16 @@ public class UnityConnectionManager : ConnectionManager
         }
     }
 
+    private void Start()
+    {
+        OnConnectionStateChanged += Disconnected;
+    }
+
+    private void OnDestroy()
+    {
+        OnConnectionStateChanged -= Disconnected;
+    }
+
     public void StartHost()
     {
         NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
@@ -40,8 +50,13 @@ public class UnityConnectionManager : ConnectionManager
         OnConnectionStateChanged?.Invoke(ConnectionState.Connected);
     }
 
-    public void Disconnect()
+    public void Disconnected(ConnectionState connectionState)
     {
+        if (connectionState != ConnectionState.Disconnected)
+        {
+            return;
+        }
+
         if (NetworkManager.Singleton == null)
         {
             return;
@@ -56,8 +71,6 @@ public class UnityConnectionManager : ConnectionManager
             NetworkManager.Singleton.OnClientConnectedCallback -=
                 Singleton_OnClientConnectedCallback;
         }
-
-        OnConnectionStateChanged?.Invoke(ConnectionState.Disconnected);
 
         NetworkManager.Singleton.Shutdown(true);
     }
